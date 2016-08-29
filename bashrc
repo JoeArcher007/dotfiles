@@ -112,7 +112,7 @@ if ! shopt -oq posix; then
     . /etc/bash_completion
   fi
 fi
-. "/home/joe/.acme.sh/acme.sh.env"
+#. "/home/joe/.acme.sh/acme.sh.env"
 alias ed='ed -p"^ED^ > "'
 
 # Make CD show differnt options for when you have a spelling mistage
