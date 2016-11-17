@@ -30,3 +30,20 @@ for file in $files; do
                 echo "Creating symlink to $file in home directory."
                     ln -s $dir/$file ~/.$file
                 done
+
+echo "Would you like to link to roots rc files?"
+read -p "[Y]es/[N]o"
+
+case "$1" in 
+        "yes" | "Yes" | "Y" | "y" )
+            sudo -i
+                # create dotfiles_old in homedir
+                #echo "Creating $olddir for backup of any existing dotfiles in ~"
+                #mkdir -p $olddir
+                #echo "...done"
+                pwd
+        ;;
+        "no" | "No" | "N" | "n")
+            echo "NOPE"
+        ;;
+esac
