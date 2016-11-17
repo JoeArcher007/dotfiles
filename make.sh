@@ -32,18 +32,22 @@ for file in $files; do
                 done
 
 echo "Would you like to link to roots rc files?"
-read -p "[Y]es/[N]o"
+read -p "[Y]es/[N]o: " yno
 
-case "$1" in 
-        "yes" | "Yes" | "Y" | "y" )
-            sudo -i
-                # create dotfiles_old in homedir
-                #echo "Creating $olddir for backup of any existing dotfiles in ~"
-                #mkdir -p $olddir
-                #echo "...done"
-                pwd
+user_name=$USER
+
+case "$yno" in 
+         [yY] | [yY][Ee][sS] )
+             for file in $files; do
+                 echo "renaming old dotfiles"
+                 sudo -i mv /root/.$file /root/."$file".bak
+                 echo "Creating the symlinks"
+                 sudo -i ln -s $HOME/dotfiles/$file /root/.$file
+             done
+        #sudo -i mv /root/.bashrc /root/.bashrc.bak ; mv /root/.vimrc /root/.vimrc.bak ; mv /root/.inputrc /root/.inputrc.bak ; ln -s $HOME/dotfiles/bashrc /root/.bashrc && ln -s $HOME/dotfiles/vimrc /root/.vimrc && ln -s $HOME/dotfiles/inputrc /root/.inputrc
+        echo "All files have been renamed to .bak, and files have been linked to $home/dotfiles/*.rc"
         ;;
-        "no" | "No" | "N" | "n")
+        [Nn] | [Nn][Oo] )
             echo "NOPE"
         ;;
 esac
