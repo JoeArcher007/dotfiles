@@ -39,7 +39,7 @@ user_name=$USER
 case "$yno" in 
          [yY] | [yY][Ee][sS] )
              for file in $files; do
-                 echo "renaming old dotfiles"
+                 echo "renaming old file $file"
                  sudo -i mv /root/.$file /root/."$file".bak
                  echo "Creating the symlinks"
                  sudo -i ln -s $HOME/dotfiles/$file /root/.$file
