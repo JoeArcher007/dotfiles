@@ -142,3 +142,7 @@ alias ed='ed -p"^ED^ > "'
 
 # Make CD show differnt options for when you have a spelling mistage
 shopt -s cdspell
+export EDITOR=vim
+
+# Variable for the program diary
+export DIARY_DIR=/JoNas/joe/.diary
