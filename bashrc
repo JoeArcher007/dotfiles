@@ -146,3 +146,4 @@ export EDITOR=vim
 
 # Variable for the program diary
 export DIARY_DIR=/JoNas/joe/.diary
+export LC_COLLATE=C
