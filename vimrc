@@ -158,4 +158,4 @@ nnoremap <C-L> :nohl<CR><C-L>
 
 
 "------------------------------------------------------------
-
+setlocal spell spelllang=en_ca
