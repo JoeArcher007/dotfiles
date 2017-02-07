@@ -145,5 +145,10 @@ shopt -s cdspell
 export EDITOR=vim
 
 # Variable for the program diary
-export DIARY_DIR=/JoNas/joe/.diary
+
+if [ -d /JoNas ]; then
+    export DIARY_DIR=/JoNas/joe/.diary
+else
+    export DIARY_DIR=~/.diary
+fi
 export LC_COLLATE=C
