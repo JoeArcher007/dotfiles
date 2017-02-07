@@ -140,6 +140,9 @@ fi
 #. "/home/joe/.acme.sh/acme.sh.env"
 alias ed='ed -p"^ED^ > "'
 
+# Alias to find external IP anywhere
+alias wanip='dig +short myip.opendns.com @resolver1.opendns.com'
+
 # Make CD show differnt options for when you have a spelling mistage
 shopt -s cdspell
 export EDITOR=vim
