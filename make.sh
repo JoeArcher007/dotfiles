@@ -20,19 +20,19 @@ echo "...done"
 
 # change to the dotfiles directory
 echo "Changing to the $dir directory"
-cd $dir
+cd $dir || exit
 echo "...done"
 
 # move any existing dotfiles in homedir to dotfiles_old directory, then create symlinks 
 for file in $files; do
         echo "Moving any existing dotfiles from ~ to $olddir"
-            mv ~/.$file ~/dotfiles_old/
+            mv ~/."$file" ~/dotfiles_old/
                 echo "Creating symlink to $file in home directory."
-                    ln -s $dir/$file ~/.$file
+                    ln -s $dir/"$file" ~/."$file"
                 done
 
 echo "Would you like to link to roots rc files?"
-read -p "[Y]es/[N]o: " yno
+read -p -r "[Y]es/[N]o: " yno
 
 user_name=$USER
 
@@ -40,9 +40,9 @@ case "$yno" in
          [yY] | [yY][Ee][sS] )
              for file in $files; do
                  echo "renaming old file $file"
-                 sudo -i mv /root/.$file /root/."$file".bak
+                 sudo -i mv /root/."$file" /root/."$file".bak
                  echo "Creating the symlinks"
-                 sudo -i ln -s $HOME/dotfiles/$file /root/.$file
+                 sudo -i ln -s "$HOME"/dotfiles/"$file" /root/."$file"
              done
         #sudo -i mv /root/.bashrc /root/.bashrc.bak ; mv /root/.vimrc /root/.vimrc.bak ; mv /root/.inputrc /root/.inputrc.bak ; ln -s $HOME/dotfiles/bashrc /root/.bashrc && ln -s $HOME/dotfiles/vimrc /root/.vimrc && ln -s $HOME/dotfiles/inputrc /root/.inputrc
         echo "All files have been renamed to .bak, and files have been linked to $home/dotfiles/*.rc"
