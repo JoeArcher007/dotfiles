@@ -26,13 +26,13 @@ echo "...done"
 # move any existing dotfiles in homedir to dotfiles_old directory, then create symlinks 
 for file in $files; do
         echo "Moving any existing dotfiles from ~ to $olddir"
-            mv ~/."$file" ~/dotfiles_old/
+            mv ~/."$file" "$olddir/"
                 echo "Creating symlink to $file in home directory."
                     ln -s $dir/"$file" ~/."$file"
                 done
 
 echo "Would you like to link to roots rc files?"
-read -p -r "[Y]es/[N]o: " yno
+read -p "[Y]es or [N]o: " yno
 
 user_name=$USER
 
