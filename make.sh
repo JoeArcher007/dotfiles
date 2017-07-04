@@ -7,8 +7,8 @@
 
 ########## Variables
 
-dir=~/dotfiles                    # dotfiles directory
-olddir=~/.dotfiles_old             # old dotfiles backup directory
+dir=$HOME/dotfiles                    # dotfiles directory
+olddir=$HOME/.dotfiles_old             # old dotfiles backup directory
 files="bashrc vimrc inputrc bash_aliases"    # list of files/folders to symlink in homedir
 
 ##########
@@ -45,7 +45,7 @@ case "$yno" in
                  sudo -i ln -s "$HOME"/dotfiles/"$file" /root/."$file"
              done
         #sudo -i mv /root/.bashrc /root/.bashrc.bak ; mv /root/.vimrc /root/.vimrc.bak ; mv /root/.inputrc /root/.inputrc.bak ; ln -s $HOME/dotfiles/bashrc /root/.bashrc && ln -s $HOME/dotfiles/vimrc /root/.vimrc && ln -s $HOME/dotfiles/inputrc /root/.inputrc
-        echo "All files have been renamed to .bak, and files have been linked to $home/dotfiles/*.rc"
+        echo "All files have been renamed to .bak, and files have been linked to $HOME/dotfiles/*.rc"
         ;;
         [Nn] | [Nn][Oo] )
             echo "NOPE"
