@@ -1,1 +1,1 @@
-alias supdate='sudo apt update --allow-insecure-updates && sudo apt dist-upgrade'
+alias supdate='sudo apt update --allow-insecure-repositories && sudo apt dist-upgrade'
