@@ -155,3 +155,5 @@ else
     export DIARY_DIR=~/.diary
 fi
 export LC_COLLATE=C
+
+eval "$(dircolors)"
