@@ -28,7 +28,7 @@ shopt -s checkwinsize
 #shopt -s globstar
 
 # make less more friendly for non-text input files, see lesspipe(1)
-#[ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
+[ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
 
 # set variable identifying the chroot you work in (used in the prompt below)
 if [ -z "${debian_chroot:-}" ] && [ -r /etc/debian_chroot ]; then
@@ -60,16 +60,12 @@ fi
 # Depending on the HostName, it will change the colour of the prompt.
 # Lastly if it's root user, change it to red.
 if [ "$color_prompt" = yes ]; then
-#PS1="\u@\h [\w]\n\t \\$ \[$(tput sgr0)\]"
-#prompt_color_change=$(tput setaf $(hostname | sum | awk -v ncolors=$(infocmp -1 | expand | sed -n -e "s/^ *colors#\([0-9][0-9]*\),.*/\1/p") 'ncolors>1 {print 1 + ($1 % (ncolors - 1))}'))
-#export PS1="$(prompt_color_change)$PS1\[e\0m\]"
 
-if [ $(id -u) -eq 0 ]; then
+    if [ $(id -u) -eq 0 ]; then
         PS1="\[\033[38;5;196m\]\u\[$(tput sgr0)\]\[\033[38;5;15m\]@\[$(tput sgr0)\]\[\033[38;5;196m\]\H\[$(tput sgr0)\]\[\033[38;5;15m\]: \[$(tput sgr0)\]\[\033[38;5;196m\][\w]\[$(tput sgr0)\]\[\033[38;5;15m\]:\n\[$(tput sgr0)\]\[\033[38;5;196m\]\t\[$(tput sgr0)\]\[\033[38;5;15m\] \[$(tput sgr0)\]\[\033[38;5;196m\]\\$\[$(tput sgr0)\]\[\033[38;5;15m\] \[$(tput sgr0)\]"
     else
         PS1="\u@\h [\w]\n\t \\$ \[$(tput sgr0)\]"
         export PS1="$(tput setaf $(hostname | sum | awk -v ncolors=$(infocmp -1 | expand | sed -n -e "s/^ *colors#\([0-9][0-9]*\),.*/\1/p") 'ncolors>1 {print 1 + ($1 % (ncolors - 1))}'))$PS1"
-        
     fi
 else
         PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
@@ -135,12 +131,14 @@ shopt -s cdspell
 export EDITOR=vim
 
 # Variable for the program diary
-
 if [ -d /JoNas ]; then
     export DIARY_DIR=/JoNas/joe/.diary
 else
     export DIARY_DIR=~/.diary
 fi
+
+# The below is to sort the files in cap's first, and then not caps second. Easier to read and sort through IMO
 export LC_COLLATE=C
+
 
 eval "$(dircolors)"
