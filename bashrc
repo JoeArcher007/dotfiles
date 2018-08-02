@@ -120,7 +120,11 @@ if ! shopt -oq posix; then
     . /etc/bash_completion
   fi
 fi
-#. "/home/joe/.acme.sh/acme.sh.env"
+
+if [ -d /home/joe/.acme.sh ]; then
+. "/home/joe/.acme.sh/acme.sh.env"
+fi
+
 alias ed='ed -p"^ED^ > "'
 
 # Alias to find external IP anywhere
