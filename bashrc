@@ -64,9 +64,10 @@ if [ "$color_prompt" = yes ]; then
     if [ $(id -u) -eq 0 ]; then
         PS1="\[\033[38;5;196m\]\u\[$(tput sgr0)\]\[\033[38;5;15m\]@\[$(tput sgr0)\]\[\033[38;5;196m\]\H\[$(tput sgr0)\]\[\033[38;5;15m\]: \[$(tput sgr0)\]\[\033[38;5;196m\][\w]\[$(tput sgr0)\]\[\033[38;5;15m\]:\n\[$(tput sgr0)\]\[\033[38;5;196m\]\t\[$(tput sgr0)\]\[\033[38;5;15m\] \[$(tput sgr0)\]\[\033[38;5;196m\]\\$\[$(tput sgr0)\]\[\033[38;5;15m\] \[$(tput sgr0)\]"
     else
-        PS1="\u@\h [\w]\n\t \\$ \[$(tput sgr0)\]"
-        export PS1="$(tput setaf $(hostname | sum | awk -v ncolors=$(infocmp -1 | expand | sed -n -e "s/^ *colors#\([0-9][0-9]*\),.*/\1/p") 'ncolors>1 {print 1 + ($1 % (ncolors - 1))}'))$PS1"
-    fi
+#        PS1="\u@\h [\w]\n\t \\$ \[$(tput sgr0)\]"
+#        export PS1="$(tput setaf $(hostname | sum | awk -v ncolors=$(infocmp -1 | expand | sed -n -e "s/^ *colors#\([0-9][0-9]*\),.*/\1/p") 'ncolors>1 {print 1 + ($1 % (ncolors - 1))}'))$PS1"
+    export PS1="\[$(tput bold)\]\[\033[38;5;10m\]\u@\h\[$(tput sgr0)\]:\[$(tput sgr0)\]\[\033[38;5;14m\][\[$(tput sgr0)\]\[\033[38;5;6m\]\w]\[$(tput sgr0)\]\[\033[38;5;15m\]\n\[$(tput sgr0)\]\[\033[38;5;10m\]\t\\$\[$(tput sgr0)\]"
+fi
 else
         PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
 fi
