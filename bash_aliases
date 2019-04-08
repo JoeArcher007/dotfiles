@@ -2,4 +2,4 @@ alias supdate='sudo apt update --allow-insecure-repositories && sudo apt dist-up
 alias dbox='/JoNAS/joe/Programs/Dropbox-Uploader/dropShell.sh'
 alias sha1='openssl sha1'
 alias ports='netstat -tulanp'
-alias rupdate='sudo apt update && sudo apt dist-upgradei -y'
+alias rupdate='sudo apt update && sudo apt dist-upgrade -y'
