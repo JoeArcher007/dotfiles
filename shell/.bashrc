@@ -8,16 +8,29 @@ case $- in
       *) return;;
 esac
 
-# don't put duplicate lines or lines starting with space in the history.
-# See bash(1) for more options
-HISTCONTROL=ignoreboth
+# Avoid duplicate entries
+HISTCONTROL="erasedupes:ignoreboth"
 
 # append to the history file, don't overwrite it
 shopt -s histappend
 
 # for setting history length see HISTSIZE and HISTFILESIZE in bash(1)
-HISTSIZE=1000
-HISTFILESIZE=2000
+HISTSIZE=50000
+HISTFILESIZE=10000
+
+# Use standard ISO 8601 timestamp
+# %F equivalent to %Y-%m-%d
+# %T equivalent to %H:%M:%S (24-hours format)
+HISTTIMEFORMAT='%F %T '
+
+# Save multi-line commands as one command
+shopt -s cmdhist
+
+# Record each line as it gets issued
+PROMPT_COMMAND='history -a'
+
+# Don't record some commands
+export HISTIGNORE="&:[ ]*:exit:ls:bg:fg:history:clear"
 
 # check the window size after each command and, if necessary,
 # update the values of LINES and COLUMNS.
@@ -134,18 +147,11 @@ alias ed='ed -p"^ED^ > "'
 alias wanip='dig +short myip.opendns.com @resolver1.opendns.com'
 
 # Make CD show differnt options for when you have a spelling mistage
-shopt -s cdspell
+shopt -s cdspell 2> /dev/null
+shopt -s dirspell 2> /dev/null
+shopt -s autocd 2> /dev/null
 export EDITOR=vim
-
-# Variable for the program diary
-if [ -d /JoNas ]; then
-    export DIARY_DIR=/JoNas/joe/.diary
-else
-    export DIARY_DIR=~/.diary
-fi
 
 # The below is to sort the files in cap's first, and then not caps second. Easier to read and sort through IMO
 export LC_COLLATE=C
-
-
 eval "$(dircolors)"

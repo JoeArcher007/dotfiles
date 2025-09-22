@@ -1,4 +1,0 @@
-$include /etc/inputrc
-set completion-ignore-case On
-set colored-stats on
-set visible-stats On
