@@ -7,6 +7,11 @@ case $- in
       *) return;;
 esac
 
+# Ghostty shell integration for Bash. This must be at the top of your bashrc!
+if [ -n "${GHOSTTY_RESOURCES_DIR}" ]; then
+    builtin source "${GHOSTTY_RESOURCES_DIR}/shell-integration/bash/ghostty.bash"
+fi
+
 # HISTORY
 # Don't record duplicate commands, and ignore commands starting with a space or
 # duplicates of the last command.
