@@ -1,6 +1,5 @@
 # ~/.bashrc: executed by bash(1) for non-login shells.
-# see /usr/share/doc/bash/examples/startup-files (in the package bash-doc)
-# for examples
+# Modified by: Joe Archer
 
 # If not running interactively, don't do anything
 case $- in
@@ -8,31 +7,32 @@ case $- in
       *) return;;
 esac
 
-# Avoid duplicate entries
+# HISTORY
+# Don't record duplicate commands, and ignore commands starting with a space or
+# duplicates of the last command.
 HISTCONTROL="erasedupes:ignoreboth"
 
-# append to the history file, don't overwrite it
-shopt -s histappend
-
-# for setting history length see HISTSIZE and HISTFILESIZE in bash(1)
+# For setting history length see HISTSIZE and HISTFILESIZE in bash(1)
+# Keep 50k commands in memory
 HISTSIZE=50000
-HISTFILESIZE=10000
+# Keep 500k commands on disk
+HISTFILESIZE=500000
 
 # Use standard ISO 8601 timestamp
 # %F equivalent to %Y-%m-%d
 # %T equivalent to %H:%M:%S (24-hours format)
 HISTTIMEFORMAT='%F %T '
 
+# Append to the history file, don't overwrite it
+shopt -s histappend
 # Save multi-line commands as one command
 shopt -s cmdhist
-
-# Record each line as it gets issued
-PROMPT_COMMAND='history -a'
 
 # Don't record some commands
 export HISTIGNORE="&:[ ]*:exit:ls:bg:fg:history:clear"
 
-# check the window size after each command and, if necessary,
+# TERMINAL/WINDOW BEHAVIOUR
+# Check the window size after each command and, if necessary,
 # update the values of LINES and COLUMNS.
 shopt -s checkwinsize
 
@@ -40,15 +40,18 @@ shopt -s checkwinsize
 # match all files and zero or more directories and subdirectories.
 #shopt -s globstar
 
-# make less more friendly for non-text input files, see lesspipe(1)
+# FILE VIEWING
+# Make less more friendly for non-text input files, see lesspipe(1)
 [ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
 
-# set variable identifying the chroot you work in (used in the prompt below)
+# DEBIAN CHROOT DETECTION
+# Set variable identifying the chroot you work in (used in the prompt below)
 if [ -z "${debian_chroot:-}" ] && [ -r /etc/debian_chroot ]; then
     debian_chroot=$(cat /etc/debian_chroot)
 fi
 
-# set a fancy prompt (non-color, unless we know we "want" color)
+# PROMPT COLOURS / PROMPT OPTIONS
+# Set a fancy prompt (non-color, unless we know we "want" color)
 case "$TERM" in
     xterm-color|*-256color) color_prompt=yes;;
 esac
@@ -58,34 +61,58 @@ esac
 # should be on the output of commands, not on the prompt
 force_color_prompt=yes
 
+# Function to handle prompt setup
+set_prompt() {
+    local exit_status=$?
+    
+    # Update terminal title and history
+    case "$TERM" in
+        xterm*|rxvt*)
+            # Update terminal title: "user@host: cwd"
+            echo -ne "\033]0;${USER}@${HOSTNAME%%.*}: ${PWD}\007"
+            ;;
+    esac
+    
+    # Record each line as it gets issued
+    history -a
+    history -n
+    
+    # Store exit status for use in prompt (ensure it's always set)
+    LAST_EXIT_CODE=$exit_status
+}
+
+# Initialize LAST_EXIT_CODE to 0 on startup
+LAST_EXIT_CODE=0
+
+# Set PROMPT_COMMAND to run our function before each prompt
+PROMPT_COMMAND=set_prompt
+
 if [ -n "$force_color_prompt" ]; then
     if [ -x /usr/bin/tput ] && tput setaf 1 >&/dev/null; then
-	# We have color support; assume it's compliant with Ecma-48
-	# (ISO/IEC-6429). (Lack of such support is extremely rare, and such
-	# a case would tend to support setf rather than setaf.)
-	color_prompt=yes
+        # We have color support; assume it's compliant with Ecma-48
+        # (ISO/IEC-6429). (Lack of such support is extremely rare, and such
+        # a case would tend to support setf rather than setaf.)
+        color_prompt=yes
     else
-	color_prompt=
+        color_prompt=
     fi
 fi
 
-# The below is the change in colour for the bash prompts used on the systems.
-# Depending on the HostName, it will change the colour of the prompt.
-# Lastly if it's root user, change it to red.
+# The below will change the prompt colours. If it's root user, change to ALL
+# red. If it's a regular user, change to cyan/green. Else wise, just go to a
+# fallback non-coloured prompt.
 if [ "$color_prompt" = yes ]; then
-
     if [ $(id -u) -eq 0 ]; then
-        PS1="\[\033[38;5;196m\]\u\[$(tput sgr0)\]\[\033[38;5;15m\]@\[$(tput sgr0)\]\[\033[38;5;196m\]\H\[$(tput sgr0)\]\[\033[38;5;15m\]: \[$(tput sgr0)\]\[\033[38;5;196m\][\w]\[$(tput sgr0)\]\[\033[38;5;15m\]:\n\[$(tput sgr0)\]\[\033[38;5;196m\]\t\[$(tput sgr0)\]\[\033[38;5;15m\] \[$(tput sgr0)\]\[\033[38;5;196m\]\\$\[$(tput sgr0)\]\[\033[38;5;15m\] \[$(tput sgr0)\]"
+        # Root user prompt with exit status at the beginning
+        PS1='\[\e[91m\]\u@\h\[\e[91m\]:[\w]\n\[\e[91m\]\t\[\e[0m\] $(if [ "${LAST_EXIT_CODE:-0}" -eq 0 ]; then tput setaf 2; echo -n "{${LAST_EXIT_CODE:-0}}"; tput sgr0; else tput setaf 1; echo -n "{${LAST_EXIT_CODE:-1}}"; tput sgr0; fi) \[\e[91m\]\$\[\e[0m\] '
     else
-#        PS1="\u@\h [\w]\n\t \\$ \[$(tput sgr0)\]"
-#        export PS1="$(tput setaf $(hostname | sum | awk -v ncolors=$(infocmp -1 | expand | sed -n -e "s/^ *colors#\([0-9][0-9]*\),.*/\1/p") 'ncolors>1 {print 1 + ($1 % (ncolors - 1))}'))$PS1"
-
-export PS1="\[\033[38;5;10m\]\u@\h\[$(tput sgr0)\]\[\033[38;5;14m\]:[\w]\[$(tput sgr0)\]\[\033[38;5;15m\]\n\[$(tput sgr0)\]\[\033[38;5;10m\]\t\\$\[$(tput sgr0)\]\[\033[38;5;15m\] \[$(tput sgr0)\]"
-
-fi
+        # Regular user prompt with exit status after time
+        PS1='\[\e[92m\]\u@\h\[\e[96m\]:[\w]\n\[\e[92m\]\t\[\e[0m\] $(if [ "${LAST_EXIT_CODE:-0}" -eq 0 ]; then tput setaf 2; echo -n "{${LAST_EXIT_CODE:-0}}"; tput sgr0; else tput setaf 1; echo -n "{${LAST_EXIT_CODE:-1}}"; tput sgr0; fi) \[\e[92m\]\$\[\e[0m\] '
+    fi
 else
     PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
 fi
+
 unset color_prompt force_color_prompt
 
 # If this is an xterm set the title to user@host:dir
@@ -108,14 +135,6 @@ if [ -x /usr/bin/dircolors ]; then
     alias fgrep='fgrep --color=auto'
     alias egrep='egrep --color=auto'
 fi
-
-# colored GCC warnings and errors
-#export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01'
-
-# some more ls aliases
-#alias ll='ls -l'
-#alias la='ls -A'
-#alias l='ls -CF'
 
 # Alias definitions.
 # You may want to put all your additions into a separate file like
@@ -152,6 +171,7 @@ shopt -s dirspell 2> /dev/null
 shopt -s autocd 2> /dev/null
 export EDITOR=vim
 
-# The below is to sort the files in cap's first, and then not caps second. Easier to read and sort through IMO
+# The below is to sort the files in cap's first, and then not caps second.
+# Easier to read and sort through IMO
 export LC_COLLATE=C
 eval "$(dircolors)"
