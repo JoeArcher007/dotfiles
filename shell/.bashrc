@@ -69,7 +69,7 @@ force_color_prompt=yes
 # Function to handle prompt setup
 set_prompt() {
     local exit_status=$?
-    
+
     # Update terminal title and history
     case "$TERM" in
         xterm*|rxvt*)
@@ -77,11 +77,11 @@ set_prompt() {
             echo -ne "\033]0;${USER}@${HOSTNAME%%.*}: ${PWD}\007"
             ;;
     esac
-    
+
     # Record each line as it gets issued
     history -a
     history -n
-    
+
     # Store exit status for use in prompt (ensure it's always set)
     LAST_EXIT_CODE=$exit_status
 }
@@ -104,15 +104,17 @@ if [ -n "$force_color_prompt" ]; then
 fi
 
 # The below will change the prompt colours. If it's root user, change to ALL
-# red. If it's a regular user, change to cyan/green. Else wise, just go to a
-# fallback non-coloured prompt.
+# red. If it's a regular user, change to purple/cyan with colored backgrounds. 
+# Otherwise, just go to a fallback non-coloured prompt.
 if [ "$color_prompt" = yes ]; then
     if [ $(id -u) -eq 0 ]; then
-        # Root user prompt with exit status at the beginning
-        PS1='\[\e[91m\]\u@\h\[\e[91m\]:[\w]\n\[\e[91m\]\t\[\e[0m\] $(if [ "${LAST_EXIT_CODE:-0}" -eq 0 ]; then tput setaf 2; echo -n "{${LAST_EXIT_CODE:-0}}"; tput sgr0; else tput setaf 1; echo -n "{${LAST_EXIT_CODE:-1}}"; tput sgr0; fi) \[\e[91m\]\$\[\e[0m\] '
+        # Root user prompt with dark red background for username@hostname and cyan background for :[cwd]
+        # Second line shows time with green/red background based on exit status
+        PS1='\n\[\033[41;38;5;208m\]\u@\h\[\033[0m\]\[\033[46;30m\]:[\w]\[\033[0m\]\n$(if [ "${LAST_EXIT_CODE:-0}" -eq 0 ]; then printf "\[\033[42;30m\]%s {%d} >\[\033[0m\] " "$(date +%H:%M:%S)" "${LAST_EXIT_CODE}"; else printf "\[\033[41;30m\]%s {%d} >\[\033[0m\] " "$(date +%H:%M:%S)" "${LAST_EXIT_CODE}"; fi)'
     else
-        # Regular user prompt with exit status after time
-        PS1='\[\e[92m\]\u@\h\[\e[96m\]:[\w]\n\[\e[92m\]\t\[\e[0m\] $(if [ "${LAST_EXIT_CODE:-0}" -eq 0 ]; then tput setaf 2; echo -n "{${LAST_EXIT_CODE:-0}}"; tput sgr0; else tput setaf 1; echo -n "{${LAST_EXIT_CODE:-1}}"; tput sgr0; fi) \[\e[92m\]\$\[\e[0m\] '
+        # Regular user prompt with purple background for username@hostname and cyan background for :[cwd]
+        # Second line shows time with green/red background based on exit status
+        PS1='\n\[\033[45;30m\]\u@\h\[\033[0m\]\[\033[46;30m\]:[\w]\[\033[0m\]\n$(if [ "${LAST_EXIT_CODE:-0}" -eq 0 ]; then printf "\[\033[42;30m\]%s {%d} >\[\033[0m\] " "$(date +%H:%M:%S)" "${LAST_EXIT_CODE}"; else printf "\[\033[41;30m\]%s {%d} >\[\033[0m\] " "$(date +%H:%M:%S)" "${LAST_EXIT_CODE}"; fi)'
     fi
 else
     PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
