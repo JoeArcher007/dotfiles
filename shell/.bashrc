@@ -58,14 +58,11 @@ fi
 # Initialize LAST_EXIT_CODE to 0 on startup
 LAST_EXIT_CODE=0
 
-# OPTIMIZED: Simplified prompt function - removed redundant terminal title update
-# (it's already handled in PS1 below) and streamlined history handling
+# OPTIMIZED: Simplified prompt function
+# Store exit code and update history efficiently
 set_prompt() {
     LAST_EXIT_CODE=$?
-    
-    # Record each line as it gets issued
     history -a
-    history -n
 }
 
 # Set PROMPT_COMMAND to run our function before each prompt
@@ -79,12 +76,10 @@ color_prompt=yes
 # This avoids checking $(id -u) on every prompt render
 if [ "$(id -u)" -eq 0 ]; then
     # Root user prompt with dark red background for username@hostname and cyan background for :[cwd]
-    # Second line shows time with green/red background based on exit status
-    PS1='\[\e]0;\u@\h: \w\a\]\[\033[41;38;5;208m\]\u@\h\[\033[0m\]\[\033[46;30m\]:[\w]\[\033[0m\]\n$(if [ "${LAST_EXIT_CODE:-0}" -eq 0 ]; then printf "\[\033[42;30m\]%s {%d} >\[\033[0m\] " "$(date +%H:%M:%S)" "${LAST_EXIT_CODE}"; else printf "\[\033[41;30m\]%s {%d} >\[\033[0m\] " "$(date +%H:%M:%S)" "${LAST_EXIT_CODE}"; fi)'
+    PS1='\[\e]0;\u@\h: \w\a\]\[\033[41;38;5;208m\]\u@\h\[\033[0m\]\[\033[46;30m\]:[\w]\[\033[0m\]\n$(if [ "${LAST_EXIT_CODE:-0}" -eq 0 ]; then printf "\[\033[42;30m\]%s {%d} >\[\033[0m\] " "\t" "${LAST_EXIT_CODE}"; else printf "\[\033[41;30m\]%s {%d} >\[\033[0m\] " "\t" "${LAST_EXIT_CODE}"; fi)'
 else
     # Regular user prompt with purple background for username@hostname and cyan background for :[cwd]
-    # Second line shows time with green/red background based on exit status
-    PS1='\[\e]0;\u@\h: \w\a\]\[\033[45;30m\]\u@\h\[\033[0m\]\[\033[46;30m\]:[\w]\[\033[0m\]\n$(if [ "${LAST_EXIT_CODE:-0}" -eq 0 ]; then printf "\[\033[42;30m\]%s {%d} >\[\033[0m\] " "$(date +%H:%M:%S)" "${LAST_EXIT_CODE}"; else printf "\[\033[41;30m\]%s {%d} >\[\033[0m\] " "$(date +%H:%M:%S)" "${LAST_EXIT_CODE}"; fi)'
+    PS1='\[\e]0;\u@\h: \w\a\]\[\033[45;30m\]\u@\h\[\033[0m\]\[\033[46;30m\]:[\w]\[\033[0m\]\n$(if [ "${LAST_EXIT_CODE:-0}" -eq 0 ]; then printf "\[\033[42;30m\]%s {%d} >\[\033[0m\] " "\t" "${LAST_EXIT_CODE}"; else printf "\[\033[41;30m\]%s {%d} >\[\033[0m\] " "\t" "${LAST_EXIT_CODE}"; fi)'
 fi
 
 # OPTIMIZED: Removed redundant color_prompt checks and xterm title setting
@@ -108,6 +103,10 @@ fi
 if [ -d /home/joe/.acme.sh ]; then
     . "/home/joe/.acme.sh/acme.sh.env"
 fi
+
+# Aliases
+alias ed='ed -p"^ED^ > "'
+alias wanip='dig +short myip.opendns.com @resolver1.opendns.com'
 
 # Make CD show different options for when you have a spelling mistake
 shopt -s cdspell 2> /dev/null
