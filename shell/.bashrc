@@ -74,12 +74,17 @@ color_prompt=yes
 
 # OPTIMIZED: Pre-compute prompt colors based on user ID at startup
 # This avoids checking $(id -u) on every prompt render
+# For regular users, generate a unique color for hostname based on hash
 if [ "$(id -u)" -eq 0 ]; then
     # Root user prompt with dark red background for username@hostname and cyan background for :[cwd]
     PS1='\[\e]0;\u@\h: \w\a\]\[\033[41;38;5;208m\]\u@\h\[\033[0m\]\[\033[46;30m\]:[\w]\[\033[0m\]\n$(if [ "${LAST_EXIT_CODE:-0}" -eq 0 ]; then printf "\[\033[42;30m\]%s {%d} >\[\033[0m\] " "\t" "${LAST_EXIT_CODE}"; else printf "\[\033[41;30m\]%s {%d} >\[\033[0m\] " "\t" "${LAST_EXIT_CODE}"; fi)'
 else
-    # Regular user prompt with purple background for username@hostname and cyan background for :[cwd]
-    PS1='\[\e]0;\u@\h: \w\a\]\[\033[45;30m\]\u@\h\[\033[0m\]\[\033[46;30m\]:[\w]\[\033[0m\]\n$(if [ "${LAST_EXIT_CODE:-0}" -eq 0 ]; then printf "\[\033[42;30m\]%s {%d} >\[\033[0m\] " "\t" "${LAST_EXIT_CODE}"; else printf "\[\033[41;30m\]%s {%d} >\[\033[0m\] " "\t" "${LAST_EXIT_CODE}"; fi)'
+    # Generate a color code (16-231 range for 256 colors, avoiding black/white/bright)
+    # Use hostname hash to get consistent color per host
+    HOSTNAME_COLOR=$(( ($(hostname | cksum | cut -d' ' -f1) % 180) + 52 ))
+    
+    # Regular user prompt with purple background for username and hostname-based color for @hostname
+    PS1='\[\e]0;\u@\h: \w\a\]\[\033[45;30m\]\u\[\033[0m\]\[\033[48;5;'"${HOSTNAME_COLOR}"';30m\]@\h\[\033[0m\]\[\033[46;30m\]:[\w]\[\033[0m\]\n$(if [ "${LAST_EXIT_CODE:-0}" -eq 0 ]; then printf "\[\033[42;30m\]%s {%d} >\[\033[0m\] " "\t" "${LAST_EXIT_CODE}"; else printf "\[\033[41;30m\]%s {%d} >\[\033[0m\] " "\t" "${LAST_EXIT_CODE}"; fi)'
 fi
 
 # OPTIMIZED: Removed redundant color_prompt checks and xterm title setting
