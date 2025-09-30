@@ -23,5 +23,6 @@ fi
 alias ll='ls -l'
 alias la='ls -A'
 alias l='ls -CF'
-# Alias to find external IP anywhere
+alias ed='ed -p"^ED^ > "'
 alias wanip='dig +short myip.opendns.com @resolver1.opendns.com'
+
