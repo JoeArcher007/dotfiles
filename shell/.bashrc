@@ -131,3 +131,12 @@ if [ ! -f "$DIRCOLORS_CACHE" ] || [ ~/.dircolors -nt "$DIRCOLORS_CACHE" ] 2>/dev
     dircolors -b > "$DIRCOLORS_CACHE" 2>/dev/null
 fi
 [ -f "$DIRCOLORS_CACHE" ] && . "$DIRCOLORS_CACHE"
+
+# Colouring Man Pages one more time
+export LESS_TERMCAP_mb=$'\e[0;103;30m' # start blink
+export LESS_TERMCAP_md=$'\e[1;32m'     # start bold
+export LESS_TERMCAP_me=$'\e[0m'        # turn off bold, blink and underline
+export LESS_TERMCAP_so=$'\e[0;103;30m' # start standout (reverse video)
+export LESS_TERMCAP_se=$'\e[0m'        # stop standout
+export LESS_TERMCAP_us=$'\e[4;34m'     # start underline
+export LESS_TERMCAP_ue=$'\e[0m'        # stop underline
