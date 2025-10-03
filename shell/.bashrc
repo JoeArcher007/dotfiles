@@ -121,6 +121,7 @@ shopt -s autocd 2> /dev/null
 # Editor and collation settings
 export EDITOR=vim
 export LC_COLLATE=C
+export VISUAL=vim
 
 # OPTIMIZED: Cache dircolors output to avoid running it on every shell startup
 # Only regenerate if .dircolors is newer than cached version
