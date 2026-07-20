@@ -47,7 +47,12 @@ shopt -s checkwinsize
 
 # FILE VIEWING
 # Make less more friendly for non-text input files, see lesspipe(1)
-[ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
+# Debian ships the binary as `lesspipe`; Fedora/Arch ship it as `lesspipe.sh`.
+if command -v lesspipe.sh >/dev/null 2>&1; then
+    eval "$(SHELL=/bin/sh lesspipe.sh)"
+elif command -v lesspipe >/dev/null 2>&1; then
+    eval "$(SHELL=/bin/sh lesspipe)"
+fi
 
 # DEBIAN CHROOT DETECTION
 # Set variable identifying the chroot you work in (used in the prompt below)
@@ -68,10 +73,6 @@ set_prompt() {
 # Set PROMPT_COMMAND to run our function before each prompt
 PROMPT_COMMAND=set_prompt
 
-# OPTIMIZED: Skip color capability check - modern terminals support color
-# This eliminates unnecessary tput calls on every shell startup
-color_prompt=yes
-
 # OPTIMIZED: Pre-compute prompt colors based on user ID at startup
 # This avoids checking $(id -u) on every prompt render
 # For regular users, generate a unique color for hostname based on hash
@@ -81,7 +82,8 @@ if [ "$(id -u)" -eq 0 ]; then
 else
     # Generate a color code (16-231 range for 256 colors, avoiding black/white/bright)
     # Use hostname hash to get consistent color per host
-    HOSTNAME_COLOR=$(( ($(hostname | cksum | cut -d' ' -f1) % 180) + 52 ))
+    # $HOSTNAME is a bash builtin, so this avoids forking the external hostname(1) command
+    HOSTNAME_COLOR=$(( ($(echo "$HOSTNAME" | cksum | cut -d' ' -f1) % 180) + 52 ))
     
     # Regular user prompt with purple background for username and hostname-based color for @hostname
     PS1='\[\e]0;\u@\h: \w\a\]\[\033[45;30m\]\u\[\033[0m\]\[\033[48;5;'"${HOSTNAME_COLOR}"';30m\]@\h\[\033[0m\]\[\033[46;30m\]:[\w]\[\033[0m\]\n$(if [ "${LAST_EXIT_CODE:-0}" -eq 0 ]; then printf "\[\033[42;30m\]%s {%d} >\[\033[0m\] " "\t" "${LAST_EXIT_CODE}"; else printf "\[\033[41;30m\]%s {%d} >\[\033[0m\] " "\t" "${LAST_EXIT_CODE}"; fi)'
@@ -105,8 +107,8 @@ if [ -f ~/.bash_aliases ]; then
 fi
 
 # OPTIMIZED: Lazy-load acme.sh only if directory exists
-if [ -d /home/joe/.acme.sh ]; then
-    . "/home/joe/.acme.sh/acme.sh.env"
+if [ -d "$HOME/.acme.sh" ]; then
+    . "$HOME/.acme.sh/acme.sh.env"
 fi
 
 # Aliases
@@ -140,3 +142,12 @@ export LESS_TERMCAP_so=$'\e[0;103;30m' # start standout (reverse video)
 export LESS_TERMCAP_se=$'\e[0m'        # stop standout
 export LESS_TERMCAP_us=$'\e[4;34m'     # start underline
 export LESS_TERMCAP_ue=$'\e[0m'        # stop underline
+
+# Only append host-specific dirs to PATH if they exist and aren't already present,
+# so PATH doesn't grow with each new non-login shell that inherits an already-populated PATH.
+for dir in "$HOME/.spicetify" "$HOME/.local/bin"; do
+    if [ -d "$dir" ] && [[ ":$PATH:" != *":$dir:"* ]]; then
+        PATH="$PATH:$dir"
+    fi
+done
+export PATH
