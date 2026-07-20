@@ -143,11 +143,12 @@ export LESS_TERMCAP_se=$'\e[0m'        # stop standout
 export LESS_TERMCAP_us=$'\e[4;34m'     # start underline
 export LESS_TERMCAP_ue=$'\e[0m'        # stop underline
 
-# Only append host-specific dirs to PATH if they exist and aren't already present,
+# Only prepend host-specific dirs to PATH if they exist and aren't already present,
 # so PATH doesn't grow with each new non-login shell that inherits an already-populated PATH.
+# Prepended (rather than appended) so these user-installed binaries take priority over system ones.
 for dir in "$HOME/.spicetify" "$HOME/.local/bin"; do
     if [ -d "$dir" ] && [[ ":$PATH:" != *":$dir:"* ]]; then
-        PATH="$PATH:$dir"
+        PATH="$dir:$PATH"
     fi
 done
 export PATH

@@ -1,8 +1,8 @@
 # --- Color support for ls and grep (cross-platform safe) ---
 
 # GNU/Linux check: dircolors + GNU ls with --color
-if command -v dircolors >/dev/null 2>&1 && ls --color=auto >/dev/null 2>&1 2>/dev/null; then
-    eval "$(dircolors -b)"
+if command -v dircolors >/dev/null 2>&1 && ls --color=auto >/dev/null 2>&1; then
+    eval "$(dircolors -b ~/.dir_colors 2>/dev/null || dircolors -b)"
     alias ls='ls --color=auto'
     alias grep='grep --color=auto'
     alias fgrep='fgrep --color=auto'

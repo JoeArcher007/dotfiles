@@ -5,6 +5,8 @@ set -euo pipefail
 # I just wanted to try out Stow and not get super hardcore into it. This should
 # aid in that.
 
+command -v stow >/dev/null 2>&1 || { echo "stow is not installed"; exit 1; }
+
 DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 BACKUP_DIR="$HOME/.dotfiles_backup_$(date +%Y%m%d_%H%M%S)"
 
@@ -60,13 +62,15 @@ backup_existing_files "$HOME"
 stow -R "${PACKAGES[@]}"
 
 # Optionally set up for root as well
-if [ "$EUID" -ne 0 ]; then
+if [ "$EUID" -eq 0 ]; then
+  if [ "$HOME" != "/root" ]; then
+    echo "Stowing packages into /root ..."
+    backup_existing_files "/root"
+    stow -R -t /root "${PACKAGES[@]}"
+  fi
+else
   echo "To set up for root, run:"
   echo "    sudo $(realpath "$0")"
-else
-  echo "Stowing packages into /root ..."
-  backup_existing_files "/root"
-  stow -R -t /root "${PACKAGES[@]}"
 fi
 
 if [ -d "$BACKUP_DIR" ]; then

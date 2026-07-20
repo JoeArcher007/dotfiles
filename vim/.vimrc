@@ -60,6 +60,9 @@ set showcmd
 " mapping of <C-L> below)
 set hlsearch
 
+" Jump to search matches as you type, before pressing Enter
+set incsearch
+
 " Modelines have historically been a source of security vulnerabilities. As
 " such, it may be a good idea to disable them and use the securemodelines
 " script, <http://www.vim.org/scripts/script.php?script_id=1876>.
@@ -110,7 +113,14 @@ set visualbell
 set t_vb=
 
 " Enable use of the mouse for all modes
-" set mouse=a
+set mouse=a
+
+" Keep 5 lines of context visible above/below the cursor when scrolling
+set scrolloff=5
+
+" Open new horizontal/vertical splits below/right instead of above/left
+set splitbelow
+set splitright
 
 " Set the command window height to 2 lines, to avoid many cases of having to
 " "press <Enter> to continue"
@@ -158,14 +168,18 @@ nnoremap <C-L> :nohl<CR><C-L>
 
 
 "------------------------------------------------------------
-" Stuff below is stuff that I wanted to add on that may not be above
+" Statusline {{{1
+"
+" Custom statusline: filename, modified flag, filetype, file encoding,
+" line:col, total lines, percentage through file.
+" (laststatus=2, to always show it, is already set above under Usability options.)
+set statusline=%f%m%=%y\ %{strlen(&fenc)?&fenc:'none'}\ %l:%c\ %L\ %P
+
+" Highlight column 80 as a soft line-length guide
+set colorcolumn=80
+
+
+"------------------------------------------------------------
+" Personal tweaks {{{1
 
 " setlocal spell spelllang=en_ca
-
-"colorscheme sorbet
-
-set laststatus=2
-set statusline=%f%m%=%y\ %{strlen(&fenc)?&fenc:'none'}\ %l:%c\ %L\ %P
-hi StatusLine cterm=NONE ctermbg=black ctermfg=brown
-hi StatusLineNC cterm=NONE ctermbg=black ctermfg=darkgray
-set colorcolumn=80
