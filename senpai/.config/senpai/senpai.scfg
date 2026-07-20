@@ -1,0 +1,15 @@
+address kingkai.lan.joearcher.ca:6697
+nickname joe
+password-cmd secret-tool lookup service soju account joe
+
+typings false
+pane-widths {
+    channels -16
+    members -16
+    nicknames 12
+    text 100
+}
+colors {
+    nicks extended
+}
+on-highlight-beep true

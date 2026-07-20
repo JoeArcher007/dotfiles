@@ -14,6 +14,7 @@ BACKUP_DIR="$HOME/.dotfiles_backup_$(date +%Y%m%d_%H%M%S)"
 PACKAGES=(
   shell
   vim
+  senpai
 )
 
 # Function to backup existing files
