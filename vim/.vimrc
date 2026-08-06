@@ -182,4 +182,41 @@ set colorcolumn=80
 "------------------------------------------------------------
 " Personal tweaks {{{1
 
-" setlocal spell spelllang=en_ca
+" --- Colours ---------------------------------------------------------------
+" Deliberately DO NOT set 'termguicolors'. With truecolour off, Vim renders
+" syntax highlighting through the terminal's 16 ANSI colours, so it inherits
+" the accessible foot palette and follows foot's light/dark toggle for free.
+" Turning termguicolors on would hardcode RGB and break both behaviours.
+
+" --- File management: keep swap/backup/undo out of project directories ------
+" Centralise Vim's scratch files so they never litter the dirs you're editing
+" (the reason *.sw? got gitignored). A trailing // makes each filename encode
+" its full path, so same-named files in different dirs never collide.
+set directory=~/.vim/swap//
+set backupdir=~/.vim/backup//
+set undodir=~/.vim/undo//
+
+" Persistent undo: undo history survives closing and reopening a file.
+set undofile
+
+" Create those dirs on first launch, so this vimrc is portable to a new machine.
+for s:dir in [&directory, &backupdir, &undodir]
+    let s:path = expand(substitute(s:dir, '/\+$', '', ''))
+    if !isdirectory(s:path)
+        call mkdir(s:path, 'p', 0700)
+    endif
+endfor
+
+" --- Performance -----------------------------------------------------------
+" Skip redraws during macros / register replay; noticeably smoother scrolling
+" and macro playback on this older laptop.
+set lazyredraw
+
+" --- Spell checking --------------------------------------------------------
+" Prose filetypes only (never code), Canadian English. Complements the harper
+" spell-check in senpai. Handy keys: ]s / [s jump between misspellings,
+" z= list suggestions, zg add the word under the cursor to your dictionary.
+augroup prose_spell
+    autocmd!
+    autocmd FileType markdown,text,gitcommit,mail setlocal spell spelllang=en_ca
+augroup END
