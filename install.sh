@@ -15,6 +15,7 @@ PACKAGES=(
   shell
   vim
   senpai
+  foot
 )
 
 # Function to backup existing files
