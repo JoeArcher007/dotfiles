@@ -1,19 +1,28 @@
-# Joe's rc files
-I used a script from another persons github that I can't recall that basically allows for making a backup of older bashrc (or defaults) and then symbolically links the rc files inside this github.
+# Joe's dotfiles
 
-## To use
-Clone the repository to your home directory by doing the following:
+My personal dotfiles, managed with [GNU Stow](https://www.gnu.org/software/stow/). Each top-level directory is a "package" whose contents mirror the layout they should have under `$HOME`. Stow symlinks the files into place rather than copying them, so edits made in this repo take effect immediately.
 
-`git clone https://github.com/JoeArcher007/dotfiles.git`
+## Packages
 
-Once done, then go into the directory
+- `shell/` — bash config: `.bashrc`, `.bash_profile`, `.bash_aliases`, `.inputrc`
+- `vim/` — `.vimrc`
+- `senpai/` — the [senpai](https://sr.ht/~taiite/senpai/) IRC client (`.config/senpai/senpai.scfg`)
+- `foot/` — the [foot](https://codeberg.org/dnkl/foot) terminal (`.config/foot/foot.ini`)
 
-`cd dotfiles`
+## Install
 
-Then run the script
+Requires `stow`. Clone the repo (anywhere; `~/dotfiles` is typical) and run the installer:
 
-`./make.sh`
+```bash
+git clone https://github.com/JoeArcher007/dotfiles.git
+cd dotfiles
+./install.sh
+```
 
-This will move all existing rc files (vimrc, inputrc, and bashrc) into a new directory old_dotfiles and then links the new files inside dotfiles directory into the home folder.
+The installer backs up any existing, non-symlinked files at the target paths into `~/.dotfiles_backup_<timestamp>/`, then runs `stow -R` to (re)create the symlinks in `$HOME`. It also offers to repeat the process for `/root` via `sudo`.
 
-You can then logout and log back in and have the new rc files in use.
+Open a new login shell (`bash -l`) or source the affected file (e.g. `source ~/.bashrc`) to pick up changes.
+
+## Adding a package
+
+Create a new top-level directory whose internal structure mirrors `$HOME` (e.g. `git/.gitconfig`), then add its name to the `PACKAGES` array in `install.sh`.
