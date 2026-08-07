@@ -32,6 +32,9 @@ HISTTIMEFORMAT='%F %T '
 shopt -s histappend
 # Save multi-line commands as one command
 shopt -s cmdhist
+# History expansions (!!, !$, !foo) land on the command line for review before
+# running, instead of executing immediately -- a safety net against surprises.
+shopt -s histverify
 
 # Don't record noise commands. Space-prefixed and consecutive-duplicate
 # filtering is already handled by HISTCONTROL above, so this only lists the
@@ -43,9 +46,9 @@ HISTIGNORE="exit:ls:bg:fg:history:clear"
 # update the values of LINES and COLUMNS.
 shopt -s checkwinsize
 
-# If set, the pattern "**" used in a pathname expansion context will
-# match all files and zero or more directories and subdirectories.
-#shopt -s globstar
+# The pattern "**" in a pathname expansion context matches all files and zero
+# or more directories and subdirectories (e.g. ls **/*.md).
+shopt -s globstar
 
 # FILE VIEWING
 # Make less more friendly for non-text input files, see lesspipe(1)
@@ -69,7 +72,11 @@ LAST_EXIT_CODE=0
 # Store exit code and update history efficiently
 set_prompt() {
     LAST_EXIT_CODE=$?
+    # -a flushes this session's new commands to the history file; -n then reads
+    # in commands other open terminals have flushed, so history is shared live
+    # across sessions without a jarring full reload.
     history -a
+    history -n
 }
 
 # Set PROMPT_COMMAND to run our function before each prompt
@@ -113,24 +120,27 @@ if [ -d "$HOME/.acme.sh" ]; then
     . "$HOME/.acme.sh/acme.sh.env"
 fi
 
-# Aliases
-alias ed='ed -p"^ED^ > "'
-alias wanip='dig +short myip.opendns.com @resolver1.opendns.com'
+# Aliases live in ~/.bash_aliases (sourced above), not here.
 
 # Make CD show different options for when you have a spelling mistake
 shopt -s cdspell 2> /dev/null
 shopt -s dirspell 2> /dev/null
 shopt -s autocd 2> /dev/null
 
+# Refuse to clobber an existing file with > (use >| to force the overwrite).
+set -o noclobber
+
 # Editor and collation settings
 export EDITOR=vim
 export LC_COLLATE=C
 export VISUAL=vim
 
-# OPTIMIZED: Cache dircolors output to avoid running it on every shell startup
-# Only regenerate if .dircolors is newer than cached version
+# Cache dircolors output so dircolors is forked once (to build the cache), then
+# cheaply sourced on every later shell startup. Delete the cache file to force a
+# regenerate. This is the single owner of LS_COLORS; the ls/grep colour aliases
+# live in .bash_aliases.
 DIRCOLORS_CACHE=~/.cache/dircolors
-if [ ! -f "$DIRCOLORS_CACHE" ] || [ ~/.dircolors -nt "$DIRCOLORS_CACHE" ] 2>/dev/null; then
+if [ ! -f "$DIRCOLORS_CACHE" ]; then
     mkdir -p ~/.cache
     dircolors -b > "$DIRCOLORS_CACHE" 2>/dev/null
 fi

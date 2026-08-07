@@ -1,8 +1,9 @@
 # --- Color support for ls and grep (cross-platform safe) ---
 
-# GNU/Linux check: dircolors + GNU ls with --color
+# GNU/Linux check: dircolors + GNU ls with --color.
+# LS_COLORS itself is set (and cached) in .bashrc; here we only turn on the
+# --color flags for the relevant commands.
 if command -v dircolors >/dev/null 2>&1 && ls --color=auto >/dev/null 2>&1; then
-    eval "$(dircolors -b ~/.dir_colors 2>/dev/null || dircolors -b)"
     alias ls='ls --color=auto'
     alias grep='grep --color=auto'
     alias fgrep='fgrep --color=auto'
