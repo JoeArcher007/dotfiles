@@ -33,8 +33,10 @@ shopt -s histappend
 # Save multi-line commands as one command
 shopt -s cmdhist
 
-# Don't record some commands
-export HISTIGNORE="&:[ ]*:exit:ls:bg:fg:history:clear"
+# Don't record noise commands. Space-prefixed and consecutive-duplicate
+# filtering is already handled by HISTCONTROL above, so this only lists the
+# specific commands not worth keeping.
+HISTIGNORE="exit:ls:bg:fg:history:clear"
 
 # TERMINAL/WINDOW BEHAVIOUR
 # Check the window size after each command and, if necessary,
