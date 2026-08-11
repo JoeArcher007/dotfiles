@@ -164,3 +164,11 @@ for dir in "$HOME/.spicetify" "$HOME/.local/bin"; do
     fi
 done
 export PATH
+
+# SSH agent for Ansible work: load the android16 key via keychain. Guarded on
+# both keychain being installed and the key existing, so shells on hosts that
+# have neither stay error-free. keychain reuses a running agent, so re-running
+# this per shell is cheap.
+if command -v keychain >/dev/null 2>&1 && [ -f ~/.ssh/android16 ]; then
+    eval "$(keychain --eval --quiet ~/.ssh/android16)"
+fi
