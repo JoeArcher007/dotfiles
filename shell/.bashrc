@@ -105,7 +105,7 @@ PROMPT_COMMAND=set_prompt
 # id -u is checked once here, not per render.
 if [ "$(id -u)" -eq 0 ]; then
     # Root: whole identity in bold red as a danger signal, marker is a red '#'.
-    PS1='\[\e]0;\u@\h: \w\a\]\[\033[1;31m\]\u@\h\[\033[0m\]:\[\033[1;33m\][\w]\[\033[0m\]\n\[\033[2m\]\t {${EXIT_COLOR}${LAST_EXIT_CODE}\[\033[0;2m\]}\[\033[0m\] ${EXIT_COLOR}#\[\033[0m\] '
+    PS1='\[\e]0;\u@\h: \w\a\]\[\033[1;31m\]\u@\h\[\033[0m\]:\[\033[1;33m\][\w]\[\033[0m\]\n\[\033[1m\]\t\[\033[0m\] \[\033[2m\]{${EXIT_COLOR}${LAST_EXIT_CODE}\[\033[0;2m\]}\[\033[0m\] ${EXIT_COLOR}#\[\033[0m\] '
 else
     # Per-host colour, hashed into the accessible ANSI foreground set (bold
     # 31-36 and bright 91-96) so it's distinct per host yet legible in both
@@ -119,7 +119,7 @@ else
     unset _hc
 
     # user (bold green) @host (per-host colour) :[cwd] (bold cyan)
-    PS1='\[\e]0;\u@\h: \w\a\]\[\033[1;32m\]\u\[\033[0m\]\[\033['"${HOST_COLOR}"'m\]@\h\[\033[0m\]:\[\033[1;36m\][\w]\[\033[0m\]\n\[\033[2m\]\t {${EXIT_COLOR}${LAST_EXIT_CODE}\[\033[0;2m\]}\[\033[0m\] ${EXIT_COLOR}>\[\033[0m\] '
+    PS1='\[\e]0;\u@\h: \w\a\]\[\033[1;32m\]\u\[\033[0m\]\[\033['"${HOST_COLOR}"'m\]@\h\[\033[0m\]:\[\033[1;36m\][\w]\[\033[0m\]\n\[\033[1m\]\t\[\033[0m\] \[\033[2m\]{${EXIT_COLOR}${LAST_EXIT_CODE}\[\033[0;2m\]}\[\033[0m\] ${EXIT_COLOR}>\[\033[0m\] '
 fi
 
 # OPTIMIZED: Removed redundant color_prompt checks and xterm title setting
