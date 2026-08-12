@@ -118,8 +118,8 @@ else
     fi
     unset _hc
 
-    # user (bold magenta) @host (per-host colour) :[cwd] (bold cyan)
-    PS1='\[\e]0;\u@\h: \w\a\]\[\033[1;35m\]\u\[\033[0m\]\[\033['"${HOST_COLOR}"'m\]@\h\[\033[0m\]:\[\033[1;36m\][\w]\[\033[0m\]\n\[\033[2m\]\t {${EXIT_COLOR}${LAST_EXIT_CODE}\[\033[0;2m\]}\[\033[0m\] ${EXIT_COLOR}>\[\033[0m\] '
+    # user (bold green) @host (per-host colour) :[cwd] (bold cyan)
+    PS1='\[\e]0;\u@\h: \w\a\]\[\033[1;32m\]\u\[\033[0m\]\[\033['"${HOST_COLOR}"'m\]@\h\[\033[0m\]:\[\033[1;36m\][\w]\[\033[0m\]\n\[\033[2m\]\t {${EXIT_COLOR}${LAST_EXIT_CODE}\[\033[0;2m\]}\[\033[0m\] ${EXIT_COLOR}>\[\033[0m\] '
 fi
 
 # OPTIMIZED: Removed redundant color_prompt checks and xterm title setting
