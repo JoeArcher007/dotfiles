@@ -65,13 +65,23 @@ if [ -z "${debian_chroot:-}" ] && [ -r /etc/debian_chroot ]; then
     debian_chroot=$(cat /etc/debian_chroot)
 fi
 
-# Initialize LAST_EXIT_CODE to 0 on startup
+# Initialize exit-code state on startup, before the first prompt renders.
 LAST_EXIT_CODE=0
+EXIT_COLOR=$'\001\033[0;1;32m\002'   # bold green (success)
 
 # OPTIMIZED: Simplified prompt function
 # Store exit code and update history efficiently
 set_prompt() {
     LAST_EXIT_CODE=$?
+    # Colour the exit code and prompt marker green on success, red on failure.
+    # Raw ESC bytes (not \033) with \001/\002 non-print markers, since PS1
+    # decodes backslash escapes *before* it expands ${EXIT_COLOR}, so \033 here
+    # would render literally. \001/\002 are what \[ \] decode to.
+    if [ "$LAST_EXIT_CODE" -eq 0 ]; then
+        EXIT_COLOR=$'\001\033[0;1;32m\002'   # bold green
+    else
+        EXIT_COLOR=$'\001\033[0;1;31m\002'   # bold red
+    fi
     # -a flushes this session's new commands to the history file; -n then reads
     # in commands other open terminals have flushed, so history is shared live
     # across sessions without a jarring full reload.
@@ -82,20 +92,34 @@ set_prompt() {
 # Set PROMPT_COMMAND to run our function before each prompt
 PROMPT_COMMAND=set_prompt
 
-# OPTIMIZED: Pre-compute prompt colors based on user ID at startup
-# This avoids checking $(id -u) on every prompt render
-# For regular users, generate a unique color for hostname based on hash
+# Prompt design: bold *foreground* colours on the terminal's own background,
+# with no colour blocks. Blocks with black text turn illegible on a dimmed
+# backlight; foreground text rides the full brightness range behind it and
+# inherits foot's accessible 16-colour palette, so it stays readable in both
+# the light and dark themes (Ctrl+Shift+t) and in any ambient light.
+#
+# Layout (two lines):
+#   user@host:[cwd]
+#   HH:MM:SS {exit} >          (exit + marker: green on success, red on error)
+#
+# id -u is checked once here, not per render.
 if [ "$(id -u)" -eq 0 ]; then
-    # Root user prompt with dark red background for username@hostname and cyan background for :[cwd]
-    PS1='\[\e]0;\u@\h: \w\a\]\[\033[41;38;5;208m\]\u@\h\[\033[0m\]\[\033[46;30m\]:[\w]\[\033[0m\]\n$(if [ "${LAST_EXIT_CODE:-0}" -eq 0 ]; then printf "\[\033[42;30m\]%s {%d} >\[\033[0m\] " "\t" "${LAST_EXIT_CODE}"; else printf "\[\033[41;30m\]%s {%d} >\[\033[0m\] " "\t" "${LAST_EXIT_CODE}"; fi)'
+    # Root: whole identity in bold red as a danger signal, marker is a red '#'.
+    PS1='\[\e]0;\u@\h: \w\a\]\[\033[1;31m\]\u@\h\[\033[0m\]:\[\033[1;33m\][\w]\[\033[0m\]\n\[\033[2m\]\t {${EXIT_COLOR}${LAST_EXIT_CODE}\[\033[0;2m\]}\[\033[0m\] ${EXIT_COLOR}#\[\033[0m\] '
 else
-    # Generate a color code (16-231 range for 256 colors, avoiding black/white/bright)
-    # Use hostname hash to get consistent color per host
-    # $HOSTNAME is a bash builtin, so this avoids forking the external hostname(1) command
-    HOSTNAME_COLOR=$(( ($(echo "$HOSTNAME" | cksum | cut -d' ' -f1) % 180) + 52 ))
-    
-    # Regular user prompt with purple background for username and hostname-based color for @hostname
-    PS1='\[\e]0;\u@\h: \w\a\]\[\033[45;30m\]\u\[\033[0m\]\[\033[48;5;'"${HOSTNAME_COLOR}"';30m\]@\h\[\033[0m\]\[\033[46;30m\]:[\w]\[\033[0m\]\n$(if [ "${LAST_EXIT_CODE:-0}" -eq 0 ]; then printf "\[\033[42;30m\]%s {%d} >\[\033[0m\] " "\t" "${LAST_EXIT_CODE}"; else printf "\[\033[41;30m\]%s {%d} >\[\033[0m\] " "\t" "${LAST_EXIT_CODE}"; fi)'
+    # Per-host colour, hashed into the accessible ANSI foreground set (bold
+    # 31-36 and bright 91-96) so it's distinct per host yet legible in both
+    # themes. $HOSTNAME is a bash builtin, avoiding a fork of hostname(1).
+    _hc=$(( $(printf '%s' "$HOSTNAME" | cksum | cut -d' ' -f1) % 12 ))
+    if [ "$_hc" -lt 6 ]; then
+        HOST_COLOR="1;3$((_hc + 1))"   # bold 31..36
+    else
+        HOST_COLOR="1;9$((_hc - 5))"   # bright 91..96
+    fi
+    unset _hc
+
+    # user (bold magenta) @host (per-host colour) :[cwd] (bold cyan)
+    PS1='\[\e]0;\u@\h: \w\a\]\[\033[1;35m\]\u\[\033[0m\]\[\033['"${HOST_COLOR}"'m\]@\h\[\033[0m\]:\[\033[1;36m\][\w]\[\033[0m\]\n\[\033[2m\]\t {${EXIT_COLOR}${LAST_EXIT_CODE}\[\033[0;2m\]}\[\033[0m\] ${EXIT_COLOR}>\[\033[0m\] '
 fi
 
 # OPTIMIZED: Removed redundant color_prompt checks and xterm title setting
