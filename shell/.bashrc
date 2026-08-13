@@ -46,6 +46,12 @@ HISTIGNORE="exit:ls:bg:fg:history:clear"
 # update the values of LINES and COLUMNS.
 shopt -s checkwinsize
 
+# Disable XON/XOFF flow control so Ctrl+S is freed for readline's
+# forward-i-search (the partner to Ctrl+R's backward search), instead of
+# freezing terminal output. Ctrl+Q is freed too. Nothing on a modern terminal
+# relies on software flow control.
+stty -ixon 2>/dev/null
+
 # The pattern "**" in a pathname expansion context matches all files and zero
 # or more directories and subdirectories (e.g. ls **/*.md).
 shopt -s globstar
