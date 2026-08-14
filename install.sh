@@ -30,7 +30,23 @@ backup_existing_files() {
                 # Get relative path from package directory
                 rel_path="${file#$DOTFILES_DIR/$package/}"
                 target_file="$target_dir/$rel_path"
-                
+
+                # Skip anything stow already owns. A leaf symlink is caught by the
+                # `! -L` test below, but stow's *tree-folding* can symlink a whole
+                # parent directory (e.g. ~/.config/foot -> repo/foot/.config/foot).
+                # The leaf file is then not itself a symlink, so a naive `! -L`
+                # test treats it as a real user file and mv's it -- but the move
+                # travels THROUGH the folded parent symlink and lands the file
+                # outside the repo, deleting the stow source. Nested-config
+                # packages (foot, senpai) fold; flat ones (.bashrc) don't, which
+                # is why only the former vanished on repeat runs. If the target
+                # resolves to a path inside the repo it is already stowed -- leave
+                # it be.
+                resolved_target="$(readlink -f "$target_file" 2>/dev/null || true)"
+                case "$resolved_target" in
+                    "$DOTFILES_DIR"/*) continue ;;
+                esac
+
                 if [ -e "$target_file" ] && [ ! -L "$target_file" ]; then
                     echo "Found existing file: $target_file"
                     
