@@ -1,9 +1,13 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Just letting all the peeps know, I certainly did use Gippity to create this
-# I just wanted to try out Stow and not get super hardcore into it. This should
-# aid in that.
+# install.sh -- set up these dotfiles with GNU Stow.
+#
+# For each package in PACKAGES, any existing non-symlinked file at a target
+# path is moved into ~/.dotfiles_backup_<timestamp>/ (preserving its relative
+# path), then `stow -R` symlinks the package into $HOME. Files this repo already
+# owns are left untouched, so the script is idempotent and safe to re-run. Run
+# as root to additionally stow into /root. Stow defaults live in .stowrc.
 
 command -v stow >/dev/null 2>&1 || { echo "stow is not installed"; exit 1; }
 
