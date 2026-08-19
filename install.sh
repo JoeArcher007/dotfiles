@@ -20,6 +20,7 @@ PACKAGES=(
   vim
   senpai
   foot
+  tmux
 )
 
 # Function to backup existing files

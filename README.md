@@ -28,6 +28,7 @@ Stow behaviour is pinned in [`.stowrc`](.stowrc):
 | `vim/` | `~/` | `.vimrc` |
 | `senpai/` | `~/.config/senpai/` | Config for the [senpai](https://sr.ht/~taiite/senpai/) IRC client (`senpai.scfg`) |
 | `foot/` | `~/.config/foot/` | Config for the [foot](https://codeberg.org/dnkl/foot) terminal (`foot.ini`), with tuned light/dark themes |
+| `tmux/` | `~/.config/tmux/` | Config for the [tmux](https://github.com/tmux/tmux) terminal multiplexer (`tmux.conf`) |
 
 Supporting files: [`install.sh`](install.sh) (the installer), [`.stowrc`](.stowrc)
 (Stow defaults), and `.gitignore` (keeps editor swap files and machine-local
