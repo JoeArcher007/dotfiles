@@ -176,7 +176,34 @@ if [ ! -f "$DIRCOLORS_CACHE" ]; then
 fi
 [ -f "$DIRCOLORS_CACHE" ] && . "$DIRCOLORS_CACHE"
 
-# Colouring man pages. These use ANSI *indices* only, never hardcoded RGB, so
+# Man pages: recolour groff's SGR output on the way to the pager.
+#
+# groff 1.23 emits real SGR escapes (ESC[1m bold, ESC[4m underline) instead of
+# the old overstrike encoding (char, BS, char). The LESS_TERMCAP_md/us settings
+# below only fire when less has to *translate* overstrike into terminal codes,
+# so under this groff they never run and man pages render in plain bold and
+# underline with no colour at all.
+#
+# The usual fix is GROFF_NO_SGR=1, which forces groff back to overstrike and
+# does work -- but it also drops the OSC-8 hyperlinks groff embeds in man pages
+# (verified: 60 links to 0), and foot renders those, see osc8-underline in
+# foot.ini. So rewrite the SGR codes instead: hyperlinks pass through untouched
+# and the colours stay ANSI *indices*, so they still inherit the Modus palette
+# and follow the Ctrl+Shift+t toggle.
+#
+# \x1b in a pattern is a GNU sed extension, so this is guarded; on BSD/macOS
+# sed it falls back to an uncoloured pager rather than a broken one.
+if printf 'x' | sed -E 's/\x78/y/' 2>/dev/null | grep -q y; then
+    export MANPAGER="sh -c 'sed -E \"s/\x1b\[1m/\x1b[1;32m/g; s/\x1b\[4m/\x1b[4;34m/g\" | less -R'"
+else
+    export MANPAGER="less -R"
+fi
+
+# less's own rendering. LESS_TERMCAP_so is still live regardless of the above:
+# less uses the standout capability for its status line and for search-match
+# highlighting, independent of what the input looks like. md/us apply to any
+# overstrike-encoded input less is given (man is no longer such a source).
+# These use ANSI *indices* only, never hardcoded RGB, so
 # they inherit foot's Modus palette and follow the Ctrl+Shift+t theme toggle.
 #
 # Standout (search matches and the prompt line) uses reverse video rather than
