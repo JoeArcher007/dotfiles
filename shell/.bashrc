@@ -199,6 +199,17 @@ else
     export MANPAGER="less -R"
 fi
 
+# Render ANSI colour instead of printing it as literal escape codes. Needed
+# whenever colour is piped into less, e.g. `ls -lah --color=always | less` or
+# `grep --color=always ... | less` -- note the `always`, since the --color=auto
+# in .bash_aliases correctly strips colour as soon as stdout isn't a terminal.
+#
+# -R (not -r): -R passes only colour escapes through and keeps less's idea of
+# the line width correct, whereas -r passes every control character raw and can
+# corrupt the display on binary-ish input. MANPAGER above already spells out
+# `less -R` for itself, so it doesn't depend on this.
+export LESS=-R
+
 # less's own rendering. LESS_TERMCAP_so is still live regardless of the above:
 # less uses the standout capability for its status line and for search-match
 # highlighting, independent of what the input looks like. md/us apply to any
