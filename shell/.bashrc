@@ -176,14 +176,24 @@ if [ ! -f "$DIRCOLORS_CACHE" ]; then
 fi
 [ -f "$DIRCOLORS_CACHE" ] && . "$DIRCOLORS_CACHE"
 
-# Colouring Man Pages one more time
-export LESS_TERMCAP_mb=$'\e[0;103;30m' # start blink
-export LESS_TERMCAP_md=$'\e[1;32m'     # start bold
+# Colouring man pages. These use ANSI *indices* only, never hardcoded RGB, so
+# they inherit foot's Modus palette and follow the Ctrl+Shift+t theme toggle.
+#
+# Standout (search matches and the prompt line) uses reverse video rather than
+# a colour pair. The old value here was `103;30` -- black on bright yellow --
+# which assumed bright yellow is a light colour. Under any AAA palette it
+# isn't: bright yellow has to be dark enough to clear 7:1 on a light
+# background, so black-on-it measured 1.61:1 and search hits were effectively
+# invisible in light mode. Reverse video swaps the terminal's own foreground
+# and background, so it is always at maximum contrast in both themes -- the
+# same trick tmux's status bar uses.
+export LESS_TERMCAP_mb=$'\e[1;31m'     # start blink      -> bold red
+export LESS_TERMCAP_md=$'\e[1;32m'     # start bold       -> bold green
 export LESS_TERMCAP_me=$'\e[0m'        # turn off bold, blink and underline
-export LESS_TERMCAP_so=$'\e[0;103;30m' # start standout (reverse video)
-export LESS_TERMCAP_se=$'\e[0m'        # stop standout
-export LESS_TERMCAP_us=$'\e[4;34m'     # start underline
-export LESS_TERMCAP_ue=$'\e[0m'        # stop underline
+export LESS_TERMCAP_so=$'\e[7m'        # start standout   -> reverse video
+export LESS_TERMCAP_se=$'\e[27m'       # stop standout    -> reverse off
+export LESS_TERMCAP_us=$'\e[4;34m'     # start underline  -> underlined blue
+export LESS_TERMCAP_ue=$'\e[24m'       # stop underline   -> underline off
 
 # Only prepend host-specific dirs to PATH if they exist and aren't already present,
 # so PATH doesn't grow with each new non-login shell that inherits an already-populated PATH.
