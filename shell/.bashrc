@@ -38,6 +38,10 @@ HISTTIMEFORMAT='%F %T '
 shopt -s histappend
 # Save multi-line commands as one command
 shopt -s cmdhist
+# ...but keep their newlines rather than collapsing them onto one
+# semicolon-joined line, so a recalled loop or heredoc reads the way it was
+# typed. Only has an effect alongside cmdhist above.
+shopt -s lithist
 # History expansions (!!, !$, !foo) land on the command line for review before
 # running, instead of executing immediately -- a safety net against surprises.
 shopt -s histverify
@@ -45,12 +49,23 @@ shopt -s histverify
 # Don't record noise commands. Space-prefixed and consecutive-duplicate
 # filtering is already handled by HISTCONTROL above, so this only lists the
 # specific commands not worth keeping.
-HISTIGNORE="exit:ls:bg:fg:history:clear"
+#
+# Patterns are matched against the whole line, not a prefix, so a bare "ls"
+# entry never matches "ls -la". The trailing-* forms are what actually keep
+# routine listings and directory changes out of the history.
+HISTIGNORE="exit:clear:bg:fg:history:history *:ls:ls *:cd:cd *:pwd"
 
 # TERMINAL/WINDOW BEHAVIOUR
 # Check the window size after each command and, if necessary,
 # update the values of LINES and COLUMNS.
 shopt -s checkwinsize
+
+# On exit, list stopped/running jobs and refuse the first exit instead of
+# silently killing them. A second exit still goes through.
+shopt -s checkjobs
+
+# Don't scan the whole of PATH when Tab is pressed on an empty command line.
+shopt -s no_empty_cmd_completion
 
 # Disable XON/XOFF flow control so Ctrl+S is freed for readline's
 # forward-i-search, instead of freezing terminal output. Ctrl+Q is freed too.
@@ -106,6 +121,10 @@ set_prompt() {
 
 # Set PROMPT_COMMAND to run our function before each prompt
 PROMPT_COMMAND=set_prompt
+
+# Collapse \w to the last few components once a path gets deep, so the first
+# prompt line stops wrapping. Leading components become "...".
+PROMPT_DIRTRIM=3
 
 # Prompt design: bold *foreground* colours on the terminal's own background,
 # with no colour blocks. Blocks with black text turn illegible on a dimmed

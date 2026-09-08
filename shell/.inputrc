@@ -6,5 +6,10 @@ set colored-completion-prefix on
 set visible-stats on
 set mark-symlinked-directories on
 set show-all-if-ambiguous on
+# When completing mid-word, don't re-insert the part already typed to the right
+# of the cursor (avoids "fooo" from completing "foo" inside "fo|o").
+set skip-completed-text on
+# Ask before dumping a huge match list; the default of 100 fires often.
+set completion-query-items 200
 "\e[A": history-search-backward
 "\e[B": history-search-forward
