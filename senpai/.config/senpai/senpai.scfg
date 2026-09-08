@@ -6,7 +6,7 @@ typings true
 spell-check true
 pane-widths {
     channels -16
-    members -16
+    members 16
     nicknames 12
     text 100
 }
