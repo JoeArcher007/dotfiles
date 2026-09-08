@@ -15,7 +15,13 @@ fi
 # HISTORY
 # Don't record duplicate commands, and ignore commands starting with a space or
 # duplicates of the last command.
-HISTCONTROL="erasedupes:ignoreboth"
+#
+# The value is "erasedups", not "erasedupes". Bash ignores any element it
+# doesn't recognise *silently*, so the misspelling this used to carry meant the
+# erase-duplicates behaviour never once ran. Note it prunes the in-memory list
+# only: `history -a` in set_prompt() appends just the new lines, so the on-disk
+# file still accumulates duplicates. In-memory is what Ctrl+R searches.
+HISTCONTROL="erasedups:ignoreboth"
 
 # For setting history length see HISTSIZE and HISTFILESIZE in bash(1)
 # Keep 50k commands in memory
