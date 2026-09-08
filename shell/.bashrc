@@ -53,9 +53,12 @@ HISTIGNORE="exit:ls:bg:fg:history:clear"
 shopt -s checkwinsize
 
 # Disable XON/XOFF flow control so Ctrl+S is freed for readline's
-# forward-i-search (the partner to Ctrl+R's backward search), instead of
-# freezing terminal output. Ctrl+Q is freed too. Nothing on a modern terminal
-# relies on software flow control.
+# forward-i-search, instead of freezing terminal output. Ctrl+Q is freed too.
+# Nothing on a modern terminal relies on software flow control.
+#
+# Ctrl+S's backward partner is Ctrl+Alt+R, not Ctrl+R: the fzf integration
+# further down takes Ctrl+R for fuzzy history search, so readline's own
+# reverse-i-search is rebound there. See the TOOL INTEGRATIONS section.
 stty -ixon 2>/dev/null
 
 # The pattern "**" in a pathname expansion context matches all files and zero
@@ -248,6 +251,47 @@ for dir in "$HOME/.spicetify" "$HOME/.local/bin"; do
     fi
 done
 export PATH
+
+# TOOL INTEGRATIONS
+# Placed after the PATH block above so tools installed under ~/.local/bin are
+# found, and -- critically -- after PROMPT_COMMAND is assigned. zoxide hooks
+# itself in by *prepending* to PROMPT_COMMAND, and the assignment above is a
+# plain string, so initialising zoxide any earlier would be silently clobbered.
+# Each is guarded, so a host without the tool installed still starts cleanly.
+
+# fzf: Ctrl+R fuzzy history, Ctrl+T file paths, Alt+C cd into a subdirectory.
+#
+# --color=16 is load-bearing. fzf otherwise draws with 256-colour codes, which
+# would be the first thing outside foot.ini to hardcode colour and would ignore
+# the Ctrl+Shift+t theme toggle; restricting it to the 16 ANSI slots keeps it on
+# the Modus palette in both themes, like everything else here.
+#
+# fzf's Ctrl+R *replaces* readline's reverse-i-search. That is wanted -- it
+# searches the whole history fuzzily and, like the histverify setting above,
+# only puts the result on the command line rather than running it. The binding
+# it displaces is kept on Ctrl+Alt+R so Ctrl+S's forward search still has its
+# counterpart. The arrow-key prefix search from .inputrc is untouched by fzf.
+if command -v fzf >/dev/null 2>&1; then
+    export FZF_DEFAULT_OPTS='--color=16 --height=40% --layout=reverse --border'
+    # Respect .gitignore and reach hidden files, but never descend into .git.
+    if command -v fd >/dev/null 2>&1; then
+        export FZF_DEFAULT_COMMAND='fd --type f --hidden --exclude .git'
+        export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+        export FZF_ALT_C_COMMAND='fd --type d --hidden --exclude .git'
+    fi
+    if command -v bat >/dev/null 2>&1; then
+        export FZF_CTRL_T_OPTS="--preview 'bat --style=numbers --color=always {}'"
+    fi
+    eval "$(fzf --bash)"
+    bind '"\e\C-r": reverse-search-history'
+fi
+
+# zoxide: `z foo` jumps to the most frecent directory matching foo, `zi` picks
+# interactively through fzf. Its PROMPT_COMMAND hook preserves $?, so the exit
+# code set_prompt() reads for the green/red prompt marker survives intact.
+if command -v zoxide >/dev/null 2>&1; then
+    eval "$(zoxide init bash)"
+fi
 
 # SSH agent for Ansible work: load the android16 key via keychain. Guarded on
 # both keychain being installed and the key existing, so shells on hosts that
