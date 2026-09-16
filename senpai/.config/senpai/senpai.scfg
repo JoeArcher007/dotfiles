@@ -1,4 +1,4 @@
-address kingkai.lan.joearcher.ca:6697
+address kingkai.ngwnn.com:6697
 nickname joe
 password-cmd secret-tool lookup service soju account joe
 
